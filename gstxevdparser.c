@@ -1,7 +1,13 @@
+#include "gstxevdparser.h"
 #include <gst/base/gstbaseparse.h>
 #include <gst/gst.h>
 
 #define XEVD_NAL_UNIT_LENGTH_BYTE 4
+#define PACKAGE "gstlcevcparser"
+#define VERSION "1.0.0"
+
+GST_DEBUG_CATEGORY_STATIC(gst_xeve_parser_debug);
+#define GST_CAT_DEFAULT gst_xeve_parser_debug
 
 typedef struct _GstXeveParse {
   GstBaseParse parent;
@@ -18,13 +24,13 @@ enum { STATE_NORMAL = 0, STATE_BUMPING = 1 };
 #define SRC_CAPS_TMPL "video/x-lvc1, parsed=(boolean)false"
 #define SINK_CAPS_TMPL "video/x-lvc1, parsed=(boolean)true"
 
-GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE(
+GstStaticPadTemplate sink_template = GST_STATIC_PAD_TEMPLATE(
     "sink", GST_PAD_SINK, GST_PAD_ALWAYS,
     GST_STATIC_CAPS(
         SINK_CAPS_TMPL
         ", stream-format = (string) byte-stream, alignment = (string) au"));
 
-GstStaticPadTemplate srctemplate = GST_STATIC_PAD_TEMPLATE(
+GstStaticPadTemplate src_template = GST_STATIC_PAD_TEMPLATE(
     "src", GST_PAD_SRC, GST_PAD_ALWAYS, GST_STATIC_CAPS(SRC_CAPS_TMPL));
 
 G_DEFINE_TYPE(GstXeveParse, gst_xeve_parse, GST_TYPE_BASE_PARSE);
@@ -44,12 +50,12 @@ static GstFlowReturn gst_xeve_parse_handle_frame(GstBaseParse *parse,
                                                  gint *skipsize);
 
 static void gst_xeve_parse_class_init(GstXeveParseClass *klass) {
+  GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
   GstElementClass *element_class = GST_ELEMENT_CLASS(klass);
   GstBaseParseClass *base_parse_class = GST_BASE_PARSE_CLASS(klass);
-  GstElementClass *element_class = GST_ELEMENT_CLASS(klass);
 
   GST_DEBUG_CATEGORY_INIT(gst_xeve_parser_debug, "xeveparser", 0,
-                          "XEVE Parser");
+                          "XEVE video parser");
 
   gobject_class->set_property = gst_xeve_parse_set_property;
   gobject_class->get_property = gst_xeve_parse_get_property;
@@ -67,7 +73,6 @@ static void gst_xeve_parse_class_init(GstXeveParseClass *klass) {
 
   base_parse_class->start = gst_xeve_parse_start;
   base_parse_class->stop = gst_xeve_parse_stop;
-  base_parse_class->set_format = gst_xeve_parse_set_format;
 
   base_parse_class->handle_frame = gst_xeve_parse_handle_frame;
 }
@@ -134,13 +139,6 @@ static gboolean gst_xeve_parse_set_format(GstBaseParse *parse, GstCaps *caps,
     GST_ERROR_OBJECT(xeveparse, "Caps are not fixed");
     return FALSE; // Indicate failure to set format
   }
-  // Here you can set properties based on the caps and state
-  // For example, you might want to set the width, height, etc.
-  GstVideoInfo *info = gst_video_codec_state_get_info(state);
-  if (!info) {
-    GST_ERROR_OBJECT(xeveparse, "Failed to get video info from codec state");
-    return FALSE; // Indicate failure to set format
-  }
 
   return TRUE; // Indicate success in setting format
 }
@@ -195,7 +193,7 @@ static GstFlowReturn gst_xeve_parse_handle_frame(GstBaseParse *parse,
 
 static gboolean plugin_init(GstPlugin *plugin) {
   return gst_element_register(plugin, "xevdparser", GST_RANK_PRIMARY,
-                              GST_TYPE_XEVE_DEC);
+                              GST_TYPE_XEVE_PARSER);
 }
 
 GST_PLUGIN_DEFINE(GST_VERSION_MAJOR, GST_VERSION_MINOR, xevdparser,
