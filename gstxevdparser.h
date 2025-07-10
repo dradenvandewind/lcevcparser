@@ -1,8 +1,8 @@
-#ifndef __GST_XEVE_ENC_H__
-#define __GST_XEVE_ENC_H__
+#ifndef __GST_XEVE_PARSER_H__
+#define __GST_XEVE_PARSER_H__
 
+#include <gst/base/gstbaseparse.h>
 #include <gst/gst.h>
-
 #include <gst/video/video.h>
 
 G_BEGIN_DECLS
@@ -11,12 +11,11 @@ G_BEGIN_DECLS
 #define GST_XEVE_PARSE(obj)                                                    \
   (G_TYPE_CHECK_INSTANCE_CAST((obj), GST_TYPE_XEVE_PARSE, GstXeveParse))
 
-#define GST_TYPE_XEVE_PARSER (gst_xeve_parser_get_type())
-G_DECLARE_FINAL_TYPE(GstXeveParser, gst_xeve_parser, GST, XEVE_PARSER,
-                     GstBaseParse)
+// Forward declarations
+typedef struct _GstXeveParse GstXeveParse;
+typedef struct _GstXeveParseClass GstXeveParseClass;
 
-struct _GstXeveParser {
-  GstBaseParse parent;
+struct _GstXeveParse {
 
   /*< private >*/
   guint bs_read_pos;
@@ -26,6 +25,12 @@ struct _GstXeveParser {
   gpointer priv;
 };
 
+struct _GstXeveParseClass {
+  GstBaseParseClass parent_class;
+};
+
+GType gst_xeve_parse_get_type(void);
+
 G_END_DECLS
 
-#endif /* __GST_XEVE_DEC_H__ */
+#endif /* __GST_XEVE_PARSER_H__ */

@@ -9,7 +9,7 @@
 GST_DEBUG_CATEGORY_STATIC(gst_xeve_parser_debug);
 #define GST_CAT_DEFAULT gst_xeve_parser_debug
 
-typedef struct _GstXeveParse {
+/* typedef struct _GstXeveParse {
   GstBaseParse parent;
   guint bs_read_pos;
   guint state;
@@ -18,6 +18,7 @@ typedef struct _GstXeveParse {
 typedef struct _GstXeveParseClass {
   GstBaseParseClass parent_class;
 } GstXeveParseClass;
+ */
 
 enum { STATE_NORMAL = 0, STATE_BUMPING = 1 };
 
@@ -193,7 +194,7 @@ static GstFlowReturn gst_xeve_parse_handle_frame(GstBaseParse *parse,
 
 static gboolean plugin_init(GstPlugin *plugin) {
   return gst_element_register(plugin, "xevdparser", GST_RANK_PRIMARY,
-                              GST_TYPE_XEVE_PARSER);
+                              GST_TYPE_XEVE_PARSE);
 }
 
 GST_PLUGIN_DEFINE(GST_VERSION_MAJOR, GST_VERSION_MINOR, xevdparser,
